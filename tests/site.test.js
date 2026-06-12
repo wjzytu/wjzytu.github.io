@@ -8,6 +8,7 @@ const js = readFileSync('assets/js/main.js', 'utf8');
 const pdfHtml = readFileSync('resume-pdf.html', 'utf8');
 const pdfCss = readFileSync('assets/css/resume-pdf.css', 'utf8');
 const pdfPath = 'assets/files/xiajunhui-ios-resume.pdf';
+const latinFontPath = 'assets/fonts/inter/InterVariable.otf';
 
 test('renders resume content from the provided PDF', () => {
   [
@@ -89,6 +90,24 @@ test('provides persistent light and dark themes', () => {
   assert.match(css, /html\[data-theme="dark"\]/);
   assert.match(css, /\.theme-button\[aria-pressed="true"\] \.theme-icon-sun\s*{[^}]*display:\s*block/s);
   assert.match(js, /localStorage\.setItem\('resumeTheme'/);
+});
+
+test('uses Inter for Latin text while keeping Chinese font configurable', () => {
+  assert.equal(existsSync(latinFontPath), true, `missing font: ${latinFontPath}`);
+  assert.ok(statSync(latinFontPath).size > 50000, `font looks too small: ${latinFontPath}`);
+
+  [css, pdfCss].forEach((stylesheet) => {
+    assert.match(stylesheet, /font-family:\s*"ResumeLatin"/);
+    assert.match(stylesheet, /InterVariable\.otf/);
+    assert.match(stylesheet, /format\("opentype"\)/);
+    assert.match(stylesheet, /font-weight:\s*100 900/);
+    assert.doesNotMatch(stylesheet, /Monda/);
+    assert.match(stylesheet, /unicode-range:\s*U\+0000-00FF/);
+    assert.match(stylesheet, /--font-latin:\s*"ResumeLatin"/);
+    assert.match(stylesheet, /--font-chinese:/);
+    assert.match(stylesheet, /--font-body:\s*var\(--font-latin\),\s*var\(--font-chinese\)/);
+    assert.match(stylesheet, /font-family:\s*var\(--font-body\)/);
+  });
 });
 
 test('provides mobile sharing and PDF export actions', () => {
