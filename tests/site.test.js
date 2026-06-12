@@ -92,6 +92,26 @@ test('provides persistent light and dark themes', () => {
   assert.match(js, /localStorage\.setItem\('resumeTheme'/);
 });
 
+test('uses a refined resume typography system and keyword emphasis', () => {
+  assert.match(css, /--font-size-body:\s*15\.8px/);
+  assert.match(css, /--font-size-lead:\s*16\.8px/);
+  assert.match(css, /--weight-title:\s*850/);
+  assert.match(css, /\.text-highlight\s*{[^}]*font-weight:\s*750/s);
+  assert.match(html, /<div class="timeline-head">[\s\S]*?<h3 data-i18n="work\.dreame\.company">[\s\S]*?<div class="timeline-meta">/);
+  assert.match(css, /\.timeline-item\s*{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(css, /\.timeline-head\s*{[^}]*justify-content:\s*space-between/s);
+  assert.match(css, /\.timeline-meta\s*{[^}]*text-align:\s*right/s);
+  assert.match(css, /\.timeline-meta span\s*{[^}]*border-radius:\s*6px/s);
+  assert.match(css, /\.project-card\s*{[^}]*background:\s*transparent/s);
+  assert.match(html, /<div class="content" data-highlight-scope>/);
+  assert.match(html, /<div class="timeline" data-highlight-scope>/);
+  assert.match(html, /<div class="project-list" data-highlight-scope>/);
+  assert.match(js, /highlightKeywords/);
+  assert.match(js, /applyKeywordHighlights/);
+  assert.match(js, /AI 工具/);
+  assert.match(js, /SwiftUI/);
+});
+
 test('uses Inter for Latin text while keeping Chinese font configurable', () => {
   assert.equal(existsSync(latinFontPath), true, `missing font: ${latinFontPath}`);
   assert.ok(statSync(latinFontPath).size > 50000, `font looks too small: ${latinFontPath}`);
@@ -146,6 +166,13 @@ test('keeps requested skill progress values', () => {
   assert.match(skillSection, /<span>Objective-C<\/span>[\s\S]*?style="width: 95%"/);
   assert.match(skillSection, /<span>Swift<\/span>[\s\S]*?style="width: 95%"/);
   assert.match(skillSection, /<span>SwiftUI<\/span>[\s\S]*?style="width: 80%"/);
+  assert.ok(
+    skillSection.indexOf('React Native / Flutter') < skillSection.indexOf('AI Tools / Cursor / Codex'),
+    'AI tools skill should be the final web skill item',
+  );
+  assert.match(skillSection, /<span>AI Tools \/ Cursor \/ Codex<\/span>[\s\S]*?data-i18n="skills.ai"[\s\S]*?style="width: 78%"/);
+  assert.match(js, /'skills.ai': 'AI 提效'/);
+  assert.match(js, /'skills.ai': 'Daily productivity'/);
   assert.doesNotMatch(skillSection, /Swift \/ SwiftUI/);
 });
 
@@ -153,6 +180,7 @@ test('uses a dedicated PDF resume template instead of the web layout', () => {
   assert.match(pdfHtml, /class="pdf-resume-document"/);
   assert.match(pdfHtml, /class="pdf-page"/);
   assert.match(pdfHtml, /class="pdf-skill-band"/);
+  assert.match(pdfHtml, /企业 OA<\/span>\s*<span>AI Tools \/ Cursor \/ Codex<\/span>/);
   assert.match(pdfHtml, /class="pdf-project-detail"/);
   assert.match(pdfCss, /@page\s*{[^}]*size:\s*A4;[^}]*margin:\s*13mm 15mm/s);
   assert.match(pdfCss, /\.pdf-page\s*{[^}]*width:\s*210mm/s);
@@ -177,6 +205,8 @@ test('includes mobile-first layout refinements', () => {
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.profile\s*{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.segmented-control\s*{[^}]*grid-column:\s*span 2/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item:not\(\.qr-open\) \.qr-popup\s*{[^}]*display:\s*none/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item\.qr-open \.qr-popup\s*{[^}]*position:\s*fixed/s);
   assert.doesNotMatch(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*position:\s*fixed;/s);
   assert.match(css, /overflow-wrap:\s*anywhere/);
 });

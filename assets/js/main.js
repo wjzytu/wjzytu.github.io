@@ -91,6 +91,7 @@ var resumeTranslations = {
     'skills.heading': '技术能力',
     'skills.expert': '熟练',
     'skills.project': '项目经验',
+    'skills.ai': 'AI 提效',
     'skills.learning': '实践与学习中',
     'toolbox.heading': '领域经验',
     'toolbox.ble': '蓝牙 BLE',
@@ -203,6 +204,7 @@ var resumeTranslations = {
     'skills.heading': 'Skills',
     'skills.expert': 'Expert',
     'skills.project': 'Project experience',
+    'skills.ai': 'Daily productivity',
     'skills.learning': 'Hands-on / Learning',
     'toolbox.heading': 'Domain Experience',
     'toolbox.ble': 'Bluetooth LE',
@@ -250,6 +252,75 @@ var resumeTranslations = {
 
   function getDictionary(language) {
     return resumeTranslations[language] || resumeTranslations.zh;
+  }
+
+  var highlightKeywords = {
+    zh: [
+      'Objective-C',
+      'SwiftUI',
+      'Swift',
+      'Apple Watch',
+      'Apple Health',
+      'React Native',
+      'Flutter',
+      '蓝牙 BLE',
+      'AI 工具',
+      'Cocoapods',
+      'App Store',
+      '线上问题排查',
+      'SDK',
+      'OTA',
+      '实时活动',
+      '小组件',
+      '代码追溯文档',
+      '合规证书'
+    ],
+    en: [
+      'Objective-C',
+      'SwiftUI',
+      'Swift',
+      'Apple Watch',
+      'Apple Health',
+      'React Native',
+      'Flutter',
+      'Bluetooth LE',
+      'AI tools',
+      'CocoaPods',
+      'App Store',
+      'production troubleshooting',
+      'SDK',
+      'OTA',
+      'Live Activities',
+      'widgets',
+      'code traceability',
+      'compliance certificates'
+    ]
+  };
+
+  function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function escapeHtml(value) {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function applyKeywordHighlights(language) {
+    var keywords = (highlightKeywords[language] || highlightKeywords.zh)
+      .slice()
+      .sort(function (a, b) {
+        return b.length - a.length;
+      });
+    var pattern = new RegExp('(' + keywords.map(escapeRegExp).join('|') + ')', 'g');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-highlight-scope] [data-i18n]'), function (element) {
+      var text = element.textContent;
+      element.innerHTML = escapeHtml(text).replace(pattern, '<span class="text-highlight">$1</span>');
+    });
   }
 
   function isMobileViewport() {
@@ -393,6 +464,7 @@ var resumeTranslations = {
         element.textContent = dictionary[key];
       }
     });
+    applyKeywordHighlights(language);
 
     root.lang = language === 'en' ? 'en' : 'zh-CN';
     languageButtons.forEach(function (button) {
