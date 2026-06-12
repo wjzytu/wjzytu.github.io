@@ -63,9 +63,11 @@ test('translates enriched resume details into English', () => {
     'watch-face display',
     '17 feature modules',
     'WPS',
-    'boss, back-office staff, and salespeople',
-    'campaign order returns',
-    'dragging a map',
+    'business owner, operations staff, and sales team',
+    'campaign order return logic',
+    'AMap-based map dragging',
+    'Project experience',
+    'Production Log Troubleshooting',
   ].forEach((text) => assert.match(js, new RegExp(text)));
 });
 
