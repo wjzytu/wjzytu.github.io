@@ -410,7 +410,6 @@ var resumeTranslations = {
     if (themeToggle) {
       var isDark = nextTheme === 'dark';
       themeToggle.setAttribute('aria-pressed', String(isDark));
-      themeToggle.querySelector('.fa').className = isDark ? 'fa fa-sun-o' : 'fa fa-moon-o';
       if (themeLabel) {
         themeLabel.textContent = dictionary[isDark ? 'controls.light' : 'controls.dark'];
       }

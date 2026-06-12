@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="uxiume.ico">
     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.css">
-    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css?v=20260612-controls">
+    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css?v=20260612-sun-icon">
 </head>
 
 <body>
@@ -78,7 +78,11 @@
                     <button class="control-button" type="button" data-lang="en">EN</button>
                 </div>
                 <button class="control-button theme-button" type="button" data-theme-toggle aria-pressed="false">
-                    <i class="fa fa-moon-o"></i>
+                    <i class="fa fa-moon-o theme-icon-moon" aria-hidden="true"></i>
+                    <svg class="theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path>
+                    </svg>
                     <span data-theme-label data-i18n="controls.dark">深色</span>
                 </button>
                 <button class="control-button action-button" type="button" data-resume-action>
@@ -387,6 +391,6 @@
 
     <script src="assets/plugins/jquery-1.11.2.min.js"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/main.js?v=20260612-footer"></script>
+    <script src="assets/js/main.js?v=20260612-sun-icon"></script>
 </body>
 </html>

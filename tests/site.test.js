@@ -81,8 +81,11 @@ test('provides language controls and translated content hooks', () => {
 test('provides persistent light and dark themes', () => {
   assert.match(html, /data-theme="light"/);
   assert.match(html, /data-theme-toggle/);
+  assert.match(html, /class="theme-icon-sun"/);
+  assert.doesNotMatch(js, /fa-sun-o/);
   assert.match(css, /:root/);
   assert.match(css, /html\[data-theme="dark"\]/);
+  assert.match(css, /\.theme-button\[aria-pressed="true"\] \.theme-icon-sun\s*{[^}]*display:\s*block/s);
   assert.match(js, /localStorage\.setItem\('resumeTheme'/);
 });
 
@@ -111,7 +114,9 @@ test('does not show expected salary information', () => {
 test('uses official Font Awesome icons for WeChat and QQ actions', () => {
   assert.match(html, /class="fa fa-weixin"/);
   assert.match(html, /class="fa fa-qq"/);
-  assert.doesNotMatch(html, /social-qr-btn"[^>]*>[\s\S]*?<svg/);
+  const socialQrButtons = html.match(/<button class="social-qr-btn"[\s\S]*?<\/button>/g) || [];
+  assert.equal(socialQrButtons.length, 2);
+  socialQrButtons.forEach((buttonHtml) => assert.doesNotMatch(buttonHtml, /<svg/));
   assert.match(css, /\.social a \.fa,[\s\S]*?\.social-qr-btn \.fa\s*{[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;/);
 });
 
@@ -149,7 +154,8 @@ test('includes mobile-first layout refinements', () => {
   assert.match(css, /@media \(max-width: 767px\)/);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.secondary\s*{[^}]*order:\s*0/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.profile\s*{[^}]*grid-template-columns:\s*1fr/s);
-  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*42px\s*42px/s);
-  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.theme-button \[data-theme-label\],[\s\S]*?\.action-button \[data-action-label\]\s*{[^}]*clip:\s*rect\(0 0 0 0\)/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.segmented-control\s*{[^}]*grid-column:\s*span 2/s);
+  assert.doesNotMatch(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*position:\s*fixed;/s);
   assert.match(css, /overflow-wrap:\s*anywhere/);
 });

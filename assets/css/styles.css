@@ -444,6 +444,34 @@ li {
   background: var(--surface-soft);
 }
 
+.theme-icon-moon,
+.theme-icon-sun {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.theme-icon-moon {
+  text-align: center;
+}
+
+.theme-icon-sun {
+  display: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-button[aria-pressed="true"] .theme-icon-moon {
+  display: none;
+}
+
+.theme-button[aria-pressed="true"] .theme-icon-sun {
+  display: block;
+}
+
 .sections-wrapper {
   padding-top: 30px;
   padding-bottom: 30px;
@@ -827,12 +855,13 @@ li {
 
   .site-controls {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 42px 42px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     align-items: center;
     gap: 8px;
   }
 
   .segmented-control {
+    grid-column: span 2;
     width: 100%;
     min-width: 0;
     height: 42px;
@@ -840,13 +869,14 @@ li {
 
   .theme-button,
   .action-button {
-    width: 42px;
-    min-width: 42px;
+    width: 100%;
+    min-width: 0;
     height: 42px;
     min-height: 42px;
-    padding: 0;
+    padding: 0 4px;
     border-radius: 8px;
-    flex: 0 0 42px;
+    flex: 1;
+    font-size: 12px;
   }
 
   .segmented-control .control-button {
@@ -857,20 +887,7 @@ li {
 
   .theme-button,
   .action-button {
-    gap: 0;
-  }
-
-  .theme-button [data-theme-label],
-  .action-button [data-action-label] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
+    gap: 3px;
   }
 
   .sections-wrapper {
