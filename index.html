@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="uxiume.ico">
     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.css">
-    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css">
+    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css?v=20260612-controls">
 </head>
 
 <body>
@@ -24,8 +24,7 @@
                     <h2 class="desc" data-i18n="hero.title">iOS 高级工程师</h2>
                     <ul class="quick-facts list-inline">
                         <li><i class="fa fa-map-marker"></i><span data-i18n="hero.city">期望城市：杭州</span></li>
-                        <li><i class="fa fa-briefcase"></i><span data-i18n="hero.salary">期望薪资：25-35K</span></li>
-                        <li><i class="fa fa-code"></i><span data-i18n="hero.stack">Objective-C / Swift / SwiftUI / React Native / Flutter </span></li>
+                        <li><span class="stack-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M10 3.5L2 8l8 4.5L18 8 10 3.5z"/><path d="M2 12l8 4.5L18 12l-1.4-.8L10 15.3 3.4 11.2 2 12z"/></svg></span><span data-i18n="hero.stack">Objective-C / Swift / SwiftUI / React Native / Flutter</span></li>
                     </ul>
                     <ul class="social list-inline">
                         <li>
@@ -42,6 +41,32 @@
                             <a href="tel:17557282155" aria-label="Phone">
                                 <i class="fa fa-phone"></i>
                             </a>
+                        </li>
+                        <li class="social-qr-item" data-qr-type="wechat" data-account="你的微信号">
+                            <button class="social-qr-btn" type="button" aria-label="微信">
+                                <i class="fa fa-weixin" aria-hidden="true"></i>
+                            </button>
+                            <div class="qr-popup">
+                                <div class="qr-popup-title">
+                                    <i class="fa fa-weixin" aria-hidden="true"></i>
+                                    微信
+                                </div>
+                                <img src="assets/images/qrcode-wechat.svg" alt="微信二维码" width="160" height="160">
+                                <p class="qr-desc">扫码添加好友</p>
+                            </div>
+                        </li>
+                        <li class="social-qr-item" data-qr-type="qq" data-account="你的QQ号">
+                            <button class="social-qr-btn" type="button" aria-label="QQ">
+                                <i class="fa fa-qq" aria-hidden="true"></i>
+                            </button>
+                            <div class="qr-popup">
+                                <div class="qr-popup-title">
+                                    <i class="fa fa-qq" aria-hidden="true"></i>
+                                    QQ
+                                </div>
+                                <img src="assets/images/qrcode-qq.svg" alt="QQ二维码" width="160" height="160">
+                                <p class="qr-desc">扫码添加好友</p>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -272,14 +297,21 @@
                                     <span>Objective-C</span>
                                     <span data-i18n="skills.expert">熟练</span>
                                 </div>
-                                <div class="level-bar"><div class="level-bar-inner" style="width: 92%"></div></div>
+                                <div class="level-bar"><div class="level-bar-inner" style="width: 95%"></div></div>
                             </div>
                             <div class="skill-item">
                                 <div class="skill-label">
-                                    <span>Swift / SwiftUI</span>
+                                    <span>Swift</span>
                                     <span data-i18n="skills.expert">熟练</span>
                                 </div>
-                                <div class="level-bar"><div class="level-bar-inner" style="width: 90%"></div></div>
+                                <div class="level-bar"><div class="level-bar-inner" style="width: 95%"></div></div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-label">
+                                    <span>SwiftUI</span>
+                                    <span data-i18n="skills.expert">熟练</span>
+                                </div>
+                                <div class="level-bar"><div class="level-bar-inner" style="width: 80%"></div></div>
                             </div>
                             <div class="skill-item">
                                 <div class="skill-label">
@@ -349,12 +381,12 @@
 
     <footer class="footer">
         <div class="container">
-            <small data-i18n="footer.note">基于简历 PDF 内容整理，支持深浅色模式、中文/英文切换和移动端浏览。</small>
+            <small data-i18n="footer.note">支持深浅色模式、中文/英文切换和移动端浏览。</small>
         </div>
     </footer>
 
     <script src="assets/plugins/jquery-1.11.2.min.js"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/main.js?v=20260612-footer"></script>
 </body>
 </html>

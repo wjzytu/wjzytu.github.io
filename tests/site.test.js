@@ -104,6 +104,25 @@ test('provides mobile sharing and PDF export actions', () => {
   assert.ok(statSync(pdfPath).size > 50000);
 });
 
+test('does not show expected salary information', () => {
+  assert.doesNotMatch(html + js + pdfHtml, /期望薪资|Expected salary|hero\.salary|25-30K|25-35K/);
+});
+
+test('uses official Font Awesome icons for WeChat and QQ actions', () => {
+  assert.match(html, /class="fa fa-weixin"/);
+  assert.match(html, /class="fa fa-qq"/);
+  assert.doesNotMatch(html, /social-qr-btn"[^>]*>[\s\S]*?<svg/);
+  assert.match(css, /\.social a \.fa,[\s\S]*?\.social-qr-btn \.fa\s*{[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;/);
+});
+
+test('keeps requested skill progress values', () => {
+  const skillSection = html.match(/<section class="section skills">[\s\S]*?<\/section>/)[0];
+  assert.match(skillSection, /<span>Objective-C<\/span>[\s\S]*?style="width: 95%"/);
+  assert.match(skillSection, /<span>Swift<\/span>[\s\S]*?style="width: 95%"/);
+  assert.match(skillSection, /<span>SwiftUI<\/span>[\s\S]*?style="width: 80%"/);
+  assert.doesNotMatch(skillSection, /Swift \/ SwiftUI/);
+});
+
 test('uses a dedicated PDF resume template instead of the web layout', () => {
   assert.match(pdfHtml, /class="pdf-resume-document"/);
   assert.match(pdfHtml, /class="pdf-page"/);
@@ -130,6 +149,7 @@ test('includes mobile-first layout refinements', () => {
   assert.match(css, /@media \(max-width: 767px\)/);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.secondary\s*{[^}]*order:\s*0/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.profile\s*{[^}]*grid-template-columns:\s*1fr/s);
-  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*42px\s*42px/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.theme-button \[data-theme-label\],[\s\S]*?\.action-button \[data-action-label\]\s*{[^}]*clip:\s*rect\(0 0 0 0\)/s);
   assert.match(css, /overflow-wrap:\s*anywhere/);
 });

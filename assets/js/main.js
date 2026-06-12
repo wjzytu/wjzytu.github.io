@@ -4,8 +4,7 @@ var resumeTranslations = {
     'hero.name': '夏军辉',
     'hero.title': 'iOS 高级工程师',
     'hero.city': '期望城市：杭州',
-    'hero.salary': '期望薪资：25-30K',
-    'hero.stack': 'Objective-C / Swift / SwiftUI / React Native',
+    'hero.stack': 'Objective-C / Swift / SwiftUI / React Native / Flutter',
     'controls.dark': '深色',
     'controls.light': '浅色',
     'controls.shareResume': '分享简历',
@@ -110,15 +109,14 @@ var resumeTranslations = {
     'languages.item1': '责任心强，能和产品、测试、后端、硬件团队一起推进需求落地。',
     'languages.item2': '能编写技术实现文档、SDK 文档和合规追溯文档。',
     'languages.item3': '中文流利，英文可用于阅读技术文档。',
-    'footer.note': '基于简历 PDF 内容整理，支持深浅色模式、中文/英文切换和移动端浏览。'
+    'footer.note': '支持深浅色模式、中文/英文切换和移动端浏览。'
   },
   en: {
     'hero.eyebrow': '11 years of experience · Hangzhou · iOS',
     'hero.name': 'Junhui Xia',
     'hero.title': 'Senior iOS Engineer',
     'hero.city': 'Preferred city: Hangzhou',
-    'hero.salary': 'Expected salary: 25-30K CNY',
-    'hero.stack': 'Objective-C / Swift / SwiftUI / React Native',
+    'hero.stack': 'Objective-C / Swift / SwiftUI / React Native / Flutter',
     'controls.dark': 'Dark',
     'controls.light': 'Light',
     'controls.shareResume': 'Share Resume',
@@ -223,7 +221,7 @@ var resumeTranslations = {
     'languages.item1': 'Responsible and collaborative with product, QA, backend, and hardware teams.',
     'languages.item2': 'Experienced in writing technical implementation docs, SDK docs, and compliance traceability documents.',
     'languages.item3': 'Native Chinese speaker; reads English technical documentation.',
-    'footer.note': 'Built from the provided resume PDF with light/dark mode, Chinese/English localization, and mobile-friendly layout.'
+    'footer.note': 'Supports light/dark mode, Chinese/English localization, and mobile-friendly layout.'
   }
 };
 
@@ -459,3 +457,100 @@ var resumeTranslations = {
   applyTheme(getStoredTheme(), getStoredLanguage());
   updateResumeActionLabel();
 }());
+
+
+// ── 微信 / QQ 二维码按钮：移动端交互 ──
+(function () {
+  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  var toast = document.getElementById('qr-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'qr-toast';
+    toast.className = 'qr-toast';
+    document.body.appendChild(toast);
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function () {
+      toast.classList.remove('show');
+    }, 2800);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  function tryOpenApp(type, account) {
+    // 尝试 URL scheme 跳转对应 App
+    if (type === 'wechat') {
+      // 微信没有公开的添加好友 scheme，退回复制
+      return false;
+    }
+    if (type === 'qq') {
+      // QQ 添加好友 scheme（部分版本支持）
+      var scheme = 'mqq://card/show_pslcard?src_type=internal&source=sharecard&version=1&uin=' + encodeURIComponent(account);
+      var iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = scheme;
+      document.body.appendChild(iframe);
+      setTimeout(function () { document.body.removeChild(iframe); }, 1500);
+      return true;
+    }
+    return false;
+  }
+
+  document.querySelectorAll('.social-qr-item').forEach(function (item) {
+    var btn = item.querySelector('.social-qr-btn');
+    var type = item.dataset.qrType;
+    var account = item.dataset.account || '';
+    var label = type === 'wechat' ? '微信' : 'QQ';
+
+    if (isMobile) {
+      // 手机端：点击按钮 → 复制 + 尝试跳转
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var opened = tryOpenApp(type, account);
+        copyText(account).then(function () {
+          if (opened) {
+            showToast('已尝试打开 ' + label + '，去搜索添加好友 👋');
+          } else {
+            showToast('已复制' + label + '号：' + account + '，去' + label + '添加好友 👋');
+          }
+        }).catch(function () {
+          showToast('请在 ' + label + ' 中搜索：' + account);
+        });
+        // 同时切换二维码展示
+        var isOpen = item.classList.contains('qr-open');
+        document.querySelectorAll('.social-qr-item.qr-open').forEach(function(el){ el.classList.remove('qr-open'); });
+        if (!isOpen) item.classList.add('qr-open');
+      });
+    } else {
+      // 桌面端：点击按钮复制，hover 显示二维码（CSS 已处理 hover）
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        copyText(account).then(function () {
+          showToast('已复制' + label + '号：' + account);
+        });
+      });
+    }
+  });
+
+  // 点击页面其他区域关闭手机端弹出框
+  document.addEventListener('click', function () {
+    document.querySelectorAll('.social-qr-item.qr-open').forEach(function(el){ el.classList.remove('qr-open'); });
+  });
+})();
