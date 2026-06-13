@@ -606,49 +606,36 @@ var resumeTranslations = {
     return img.currentSrc || img.getAttribute('src') || img.src;
   }
 
+  async function prepareQrDownloadUrl(img) {
+    if (!img || img.dataset.qrDownloadUrl || typeof fetch !== 'function' || !window.URL || !window.URL.createObjectURL) {
+      return;
+    }
+    try {
+      var response = await fetch(getQrImageUrl(img));
+      if (!response.ok) {
+        return;
+      }
+      var blob = await response.blob();
+      var downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+      img.dataset.qrDownloadUrl = window.URL.createObjectURL(downloadBlob);
+    } catch (error) {}
+  }
+
   function downloadQrImage(img, type) {
     var link = document.createElement('a');
-    link.href = getQrImageUrl(img);
+    link.href = img.dataset.qrDownloadUrl || getQrImageUrl(img);
     link.download = getQrFileName(type);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   }
 
-  async function getQrImageFile(img, type) {
-    var response = await fetch(getQrImageUrl(img));
-    if (!response.ok) {
-      throw new Error('Unable to load QR image');
-    }
-    var blob = await response.blob();
-    return new File([blob], getQrFileName(type), { type: blob.type || 'image/png' });
-  }
-
   async function saveQrImage(img, type, label) {
     if (!img) {
       return;
     }
-    if (isMobile && navigator.share && navigator.canShare && typeof fetch === 'function' && typeof File === 'function') {
-      try {
-        var file = await getQrImageFile(img, type);
-        var payload = {
-          title: label + '二维码',
-          text: '扫码添加' + label,
-          files: [file]
-        };
-        if (navigator.canShare(payload)) {
-          await navigator.share(payload);
-          showToast('请选择保存图片或分享二维码');
-          return;
-        }
-      } catch (error) {
-        if (error && error.name === 'AbortError') {
-          return;
-        }
-      }
-    }
     downloadQrImage(img, type);
-    showToast('已开始保存' + label + '二维码图片');
+    showToast('已开始下载' + label + '二维码图片');
   }
 
   function closeQrPopups() {
@@ -681,6 +668,7 @@ var resumeTranslations = {
     }
 
     if (qrImage) {
+      prepareQrDownloadUrl(qrImage);
       qrImage.addEventListener('click', function (e) {
         e.stopPropagation();
         saveQrImage(qrImage, type, label);
@@ -729,5 +717,13 @@ var resumeTranslations = {
   // 点击页面其他区域关闭手机端弹出框
   document.addEventListener('click', function () {
     closeQrPopups();
+  });
+
+  window.addEventListener('pagehide', function () {
+    document.querySelectorAll('[data-qr-image]').forEach(function (img) {
+      if (img.dataset.qrDownloadUrl && window.URL && window.URL.revokeObjectURL) {
+        window.URL.revokeObjectURL(img.dataset.qrDownloadUrl);
+      }
+    });
   });
 })();

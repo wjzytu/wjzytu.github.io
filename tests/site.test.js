@@ -9,6 +9,7 @@ const pdfHtml = readFileSync('resume-pdf.html', 'utf8');
 const pdfCss = readFileSync('assets/css/resume-pdf.css', 'utf8');
 const pdfPath = 'assets/files/xiajunhui-ios-resume.pdf';
 const latinFontPath = 'assets/fonts/inter/InterVariable.otf';
+const profileImagePath = 'assets/images/profile.png';
 const wechatQrPath = 'assets/images/qrcode-wechat.png';
 const qqQrPath = 'assets/images/qrcode-qq.png';
 
@@ -120,6 +121,12 @@ test('uses a refined resume typography system and keyword emphasis', () => {
   assert.match(css, /--font-size-body:\s*15\.8px/);
   assert.match(css, /--font-size-lead:\s*16\.8px/);
   assert.match(css, /--weight-title:\s*850/);
+  assert.match(css, /--border:\s*#dbe5ec/);
+  assert.match(css, /--border-strong:\s*#cfdbe4/);
+  assert.match(css, /\.profile-image\s*{[^}]*width:\s*154px;[^}]*height:\s*154px;[^}]*flex:\s*0 0 154px;[^}]*border:\s*2px solid var\(--border\)/s);
+  assert.match(css, /\.segmented-control\s*{[^}]*height:\s*44px;[^}]*border:\s*1px solid var\(--border\)/s);
+  assert.match(css, /\.theme-button,[\s\S]*?\.action-button\s*{[^}]*height:\s*44px;[^}]*min-height:\s*44px;[^}]*border-color:\s*var\(--border\)/s);
+  assert.match(css, /\.section-inner\s*{[^}]*border:\s*1px solid var\(--border\)/s);
   assert.match(css, /\.text-highlight\s*{[^}]*font-weight:\s*750/s);
   assert.match(html, /<div class="timeline-head">[\s\S]*?<h3 data-i18n="work\.dreame\.company">[\s\S]*?<div class="timeline-meta">/);
   assert.match(css, /\.timeline-item\s*{[^}]*grid-template-columns:\s*1fr/s);
@@ -198,11 +205,18 @@ test('uses official Font Awesome icons for WeChat and QQ actions', () => {
   assert.match(js, /'qr\.save': 'Save QR code'/);
   assert.match(js, /navigator\.canShare/);
   assert.match(js, /new File/);
+  assert.match(js, /function prepareQrDownloadUrl/);
+  assert.match(js, /application\/octet-stream/);
+  assert.match(js, /qrDownloadUrl/);
   assert.match(js, /downloadQrImage/);
+  assert.match(js, /已开始下载/);
+  const saveQrImageBlock = js.match(/async function saveQrImage[\s\S]*?function closeQrPopups/)[0];
+  assert.doesNotMatch(saveQrImageBlock, /navigator\.share|navigator\.canShare|new File/);
   assert.match(js, /function closeQrPopups/);
   assert.match(js, /function openQrPopup/);
   assert.match(js, /data-qr-backdrop/);
-  assert.match(css, /\.qr-save-btn\s*{/);
+  assert.match(css, /\.qr-popup img\s*{[^}]*margin:\s*0 auto/s);
+  assert.match(css, /\.qr-save-btn\s*{[^}]*margin:\s*10px auto 0/s);
   assert.match(css, /\.qr-close-btn\s*{/);
   assert.match(css, /\.qr-backdrop\s*{/);
   const socialQrButtons = html.match(/<button class="social-qr-btn"[\s\S]*?<\/button>/g) || [];
@@ -222,6 +236,22 @@ test('uses official Font Awesome icons for WeChat and QQ actions', () => {
     'social actions should be ordered as phone, WeChat, QQ, email, GitHub',
   );
   assert.match(css, /\.social a \.fa,[\s\S]*?\.social-qr-btn \.fa\s*{[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;/);
+});
+
+test('keeps image assets compressed for faster loading', () => {
+  assert.ok(statSync(profileImagePath).size < 20000, `profile image should stay compressed: ${profileImagePath}`);
+  assert.ok(statSync('assets/images/github-chart.png').size < 8000);
+  [
+    'assets/images/projects/project-1.png',
+    'assets/images/projects/project-2.png',
+    'assets/images/projects/project-3.png',
+    'assets/images/projects/project-4.png',
+    'assets/images/projects/project-5.png',
+  ].forEach((imagePath) => {
+    assert.ok(statSync(imagePath).size < 35000, `project image should stay compressed: ${imagePath}`);
+  });
+  assert.ok(statSync('assets/images/projects/project-featured.png').size < 100000);
+  assert.ok(statSync('assets/images/projects/project-2.jpg').size < 15000);
 });
 
 test('keeps requested skill progress values', () => {
@@ -266,8 +296,11 @@ test('includes mobile-first layout refinements', () => {
   assert.match(css, /@media \(max-width: 767px\)/);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.secondary\s*{[^}]*order:\s*0/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.profile\s*{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.profile-image\s*{[^}]*width:\s*101px;[^}]*height:\s*101px/s);
+  assert.match(css, /@media \(max-width: 420px\)[\s\S]*?\.profile-image\s*{[^}]*width:\s*91px;[^}]*height:\s*91px/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
-  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.segmented-control\s*{[^}]*grid-column:\s*span 2/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.segmented-control\s*{[^}]*grid-column:\s*span 2[\s\S]*?height:\s*44px/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.theme-button,[\s\S]*?\.action-button\s*{[^}]*height:\s*44px;[^}]*min-height:\s*44px/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?body\.qr-modal-open\s*{[^}]*overflow:\s*hidden/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item:not\(\.qr-open\) \.qr-popup\s*{[^}]*display:\s*none/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item\.qr-open \.qr-popup\s*{[^}]*position:\s*fixed[\s\S]*?top:\s*50%[\s\S]*?transform:\s*translate\(-50%,\s*-50%\)/s);
