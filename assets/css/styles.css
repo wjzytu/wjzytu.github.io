@@ -39,6 +39,11 @@ html[data-theme="light"] {
   color-scheme: only light;
 }
 
+html[data-theme="light"] body {
+  background: #eef3f6 !important;
+  color: #29323d !important;
+}
+
 html[data-theme="dark"] {
   color-scheme: only dark;
   --bg: #101820;
@@ -1026,8 +1031,9 @@ li {
     position: fixed;
     top: 50%;
     left: 50%;
-    width: min(292px, calc(100vw - 28px));
-    max-height: calc(100dvh - 40px);
+    width: clamp(280px, 88vw, 340px);
+    max-width: calc(100vw - 20px);
+    max-height: calc(100dvh - 32px);
     padding: 42px 14px 14px;
     overflow-y: auto;
     transform: translate(-50%, -50%);
@@ -1035,8 +1041,9 @@ li {
   }
 
   .social-qr-item.qr-open .qr-popup img {
-    width: min(244px, calc(100vw - 76px));
-    height: min(244px, calc(100vw - 76px));
+    width: clamp(224px, calc(88vw - 56px), 292px);
+    max-width: 100%;
+    height: clamp(224px, calc(88vw - 56px), 292px);
   }
 
   .social-qr-item.qr-open .qr-save-btn {

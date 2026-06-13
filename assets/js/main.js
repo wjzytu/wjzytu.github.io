@@ -244,6 +244,7 @@ var resumeTranslations = {
   var languageButtons = Array.prototype.slice.call(document.querySelectorAll('[data-lang]'));
   var themeToggle = document.querySelector('[data-theme-toggle]');
   var themeLabel = document.querySelector('[data-theme-label]');
+  var themeSchemeMeta = document.querySelector('meta[name="color-scheme"]');
   var themeColorMeta = document.querySelector('[data-theme-color]');
   var resumeAction = document.querySelector('[data-resume-action]');
   var resumeActionLabel = document.querySelector('[data-action-label]');
@@ -252,6 +253,42 @@ var resumeTranslations = {
   var themeColors = {
     light: '#eef3f6',
     dark: '#101820'
+  };
+  var themeTokens = {
+    light: {
+      '--bg': '#eef3f6',
+      '--surface': '#ffffff',
+      '--surface-soft': '#f6f9fb',
+      '--text': '#29323d',
+      '--muted': '#6f7d8d',
+      '--heading': '#18222f',
+      '--border': '#dbe5ec',
+      '--border-strong': '#cfdbe4',
+      '--accent': '#2f9a67',
+      '--accent-strong': '#1f7f54',
+      '--accent-soft': '#e4f5ed',
+      '--blue': '#3178b8',
+      '--highlight-bg': 'rgba(47, 154, 103, 0.1)',
+      '--highlight-text': '#176545',
+      '--shadow': '0 8px 18px rgba(24, 34, 47, 0.045)'
+    },
+    dark: {
+      '--bg': '#101820',
+      '--surface': '#17212b',
+      '--surface-soft': '#1f2b36',
+      '--text': '#e3eaf1',
+      '--muted': '#a6b4c1',
+      '--heading': '#f6f9fb',
+      '--border': '#334351',
+      '--border-strong': '#405160',
+      '--accent': '#70d49c',
+      '--accent-strong': '#9be5b8',
+      '--accent-soft': '#173325',
+      '--blue': '#83b9ed',
+      '--highlight-bg': 'rgba(112, 212, 156, 0.16)',
+      '--highlight-text': '#b4f0c8',
+      '--shadow': '0 10px 22px rgba(0, 0, 0, 0.2)'
+    }
   };
 
   function getStoredLanguage() {
@@ -394,10 +431,8 @@ var resumeTranslations = {
       return;
     }
     var dictionary = getDictionary(getStoredLanguage());
-    if (isMobileViewport() && canNativeShare()) {
+    if (isMobileViewport()) {
       setActionVisual('fa fa-share-alt', dictionary['controls.shareResume']);
-    } else if (isMobileViewport() && canCopyLink()) {
-      setActionVisual('fa fa-link', dictionary['controls.copyLink']);
     } else {
       setActionVisual('fa fa-file-pdf-o', dictionary['controls.exportPdf']);
     }
@@ -438,12 +473,12 @@ var resumeTranslations = {
           return;
         }
       }
-      await copyResumeLink();
+      downloadResumePdf();
       return;
     }
 
-    if (isMobileViewport() && canCopyLink()) {
-      await copyResumeLink();
+    if (isMobileViewport()) {
+      downloadResumePdf();
       return;
     }
 
@@ -474,6 +509,18 @@ var resumeTranslations = {
 
     root.setAttribute('data-theme', nextTheme);
     root.style.colorScheme = nextTheme === 'dark' ? 'only dark' : 'only light';
+    var tokens = themeTokens[nextTheme];
+    Object.keys(tokens).forEach(function (name) {
+      root.style.setProperty(name, tokens[name]);
+    });
+    root.style.backgroundColor = tokens['--bg'];
+    if (document.body) {
+      document.body.style.backgroundColor = tokens['--bg'];
+      document.body.style.color = tokens['--text'];
+    }
+    if (themeSchemeMeta) {
+      themeSchemeMeta.setAttribute('content', nextTheme === 'dark' ? 'dark' : 'light');
+    }
     if (themeColorMeta) {
       themeColorMeta.setAttribute('content', themeColors[nextTheme]);
     }

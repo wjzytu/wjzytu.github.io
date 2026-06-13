@@ -117,10 +117,14 @@ test('provides persistent light and dark themes', () => {
   assert.match(css, /html\[data-theme="light"\]\s*{[^}]*color-scheme:\s*only light/s);
   assert.match(css, /html\[data-theme="dark"\]/);
   assert.match(css, /html\[data-theme="dark"\]\s*{[^}]*color-scheme:\s*only dark/s);
+  assert.match(css, /html\[data-theme="light"\] body\s*{[^}]*background:\s*#eef3f6 !important;[^}]*color:\s*#29323d !important/s);
   assert.match(css, /\.theme-button\[aria-pressed="true"\] \.theme-icon-sun\s*{[^}]*display:\s*block/s);
   assert.match(js, /localStorage\.setItem\('resumeTheme'/);
   assert.match(js, /root\.style\.colorScheme/);
+  assert.match(js, /themeSchemeMeta\.setAttribute\('content'/);
   assert.match(js, /themeColorMeta\.setAttribute\('content'/);
+  assert.match(js, /themeTokens/);
+  assert.match(js, /root\.style\.setProperty\(name,\s*tokens\[name\]\)/);
 });
 
 test('uses a refined resume typography system and keyword emphasis', () => {
@@ -172,6 +176,9 @@ test('provides mobile sharing and PDF export actions', () => {
   assert.match(html, /data-action-label/);
   assert.match(js, /navigator\.share/);
   assert.match(js, /await navigator\.share\(getSharePayload\(language\)\)/);
+  assert.match(js, /if \(isMobileViewport\(\)\)\s*{[\s\S]*?setActionVisual\('fa fa-share-alt', dictionary\['controls.shareResume'\]\)/);
+  const shareResumeBlock = js.match(/async function shareResume[\s\S]*?function translatePage/)[0];
+  assert.doesNotMatch(shareResumeBlock, /copyResumeLink/);
   assert.doesNotMatch(js, /shareResumePdf/);
   assert.doesNotMatch(js, /navigator\.canShare/);
   assert.match(js, /navigator\.clipboard\.writeText/);
@@ -312,8 +319,8 @@ test('includes mobile-first layout refinements', () => {
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.theme-button,[\s\S]*?\.action-button\s*{[^}]*height:\s*44px;[^}]*min-height:\s*44px/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?body\.qr-modal-open\s*{[^}]*overflow:\s*hidden/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item:not\(\.qr-open\) \.qr-popup\s*{[^}]*display:\s*none/s);
-  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item\.qr-open \.qr-popup\s*{[^}]*position:\s*fixed[\s\S]*?width:\s*min\(292px,\s*calc\(100vw - 28px\)\)[\s\S]*?transform:\s*translate\(-50%,\s*-50%\)/s);
-  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item\.qr-open \.qr-popup img\s*{[^}]*width:\s*min\(244px,\s*calc\(100vw - 76px\)\)/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item\.qr-open \.qr-popup\s*{[^}]*position:\s*fixed[\s\S]*?width:\s*clamp\(280px,\s*88vw,\s*340px\)[\s\S]*?transform:\s*translate\(-50%,\s*-50%\)/s);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*?\.social-qr-item\.qr-open \.qr-popup img\s*{[^}]*width:\s*clamp\(224px,\s*calc\(88vw - 56px\),\s*292px\)/s);
   assert.match(css, /@media \(max-width: 767px\)[\s\S]*?body\.qr-modal-open \.qr-backdrop\s*{[^}]*pointer-events:\s*auto/s);
   assert.doesNotMatch(css, /@media \(max-width: 767px\)[\s\S]*?\.site-controls\s*{[^}]*position:\s*fixed;/s);
   assert.match(css, /overflow-wrap:\s*anywhere/);
