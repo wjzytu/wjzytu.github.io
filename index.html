@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="uxiume.ico">
     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.css">
-    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css?v=20260612-work-layout">
+    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css?v=20260613-qrcode-crop">
 </head>
 
 <body>
@@ -28,16 +28,6 @@
                     </ul>
                     <ul class="social list-inline">
                         <li>
-                            <a href="https://github.com/uxiume" target="_blank" rel="noreferrer" aria-label="GitHub">
-                                <i class="fa fa-github-alt"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="mailto:hello@uxiu.me" aria-label="Email">
-                                <i class="fa fa-envelope"></i>
-                            </a>
-                        </li>
-                        <li>
                             <a href="tel:17557282155" aria-label="Phone">
                                 <i class="fa fa-phone"></i>
                             </a>
@@ -51,7 +41,7 @@
                                     <i class="fa fa-weixin" aria-hidden="true"></i>
                                     微信
                                 </div>
-                                <img src="assets/images/qrcode-wechat.svg" alt="微信二维码" width="160" height="160">
+                                <img src="assets/images/qrcode-wechat.png?v=20260613-white" alt="微信二维码" width="204" height="204" loading="lazy" decoding="async">
                                 <p class="qr-desc">扫码添加好友</p>
                             </div>
                         </li>
@@ -64,9 +54,19 @@
                                     <i class="fa fa-qq" aria-hidden="true"></i>
                                     QQ
                                 </div>
-                                <img src="assets/images/qrcode-qq.svg" alt="QQ二维码" width="160" height="160">
+                                <img src="assets/images/qrcode-qq.png?v=20260613-qq-1931" alt="QQ二维码" width="204" height="204" loading="lazy" decoding="async">
                                 <p class="qr-desc">扫码添加好友</p>
                             </div>
+                        </li>
+                        <li>
+                            <a href="mailto:hello@uxiu.me" aria-label="Email">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/uxiume" target="_blank" rel="noreferrer" aria-label="GitHub">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -126,9 +126,11 @@
                                 <div class="timeline-body">
                                     <p class="role" data-i18n="work.dreame.role">iOS 工程师</p>
                                     <ul>
-                                        <li data-i18n="work.dreame.item1">负责追觅智能戒指 iOS App 的开发工作。</li>
-                                        <li data-i18n="work.dreame.item2">负责戒指 SDK 与 React Native 的通讯接口开发。</li>
-                                        <li data-i18n="work.dreame.item3">负责 Apple Health 能力和 App 订阅内购功能开发。</li>
+                                        <li data-i18n="work.dreame.item1">参与追觅智能戒指 App 开发，App 主体框架基于 React Native，iOS 与 Android 通过本地 SDK 与 RN 通讯承接硬件能力。</li>
+                                        <li data-i18n="work.dreame.item2">负责戒指 SDK 与 RN 通讯接口开发，封装设备连接、健康测量、音乐播放监控、订阅状态等原生能力。</li>
+                                        <li data-i18n="work.dreame.item3">开发心率、体温、血氧、睡眠等健康数据测量与展示流程，并接入 Apple Health 保存戒指采集的健康数据、睡眠数据等。</li>
+                                        <li data-i18n="work.dreame.item4">负责功能订阅的 Apple 内购能力，包括商品拉取、购买、恢复购买、订阅状态校验与权益解锁。</li>
+                                        <li data-i18n="work.dreame.item5">参与心电图绘制与健康趋势展示能力开发，根据设备采集数据完成曲线绘制、状态展示和异常场景处理。</li>
                                     </ul>
                                 </div>
                             </article>
@@ -407,6 +409,6 @@
 
     <script src="assets/plugins/jquery-1.11.2.min.js"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/main.js?v=20260612-sun-icon"></script>
+    <script src="assets/js/main.js?v=20260613-dreame-health"></script>
 </body>
 </html>

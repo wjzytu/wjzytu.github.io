@@ -9,6 +9,8 @@ const pdfHtml = readFileSync('resume-pdf.html', 'utf8');
 const pdfCss = readFileSync('assets/css/resume-pdf.css', 'utf8');
 const pdfPath = 'assets/files/xiajunhui-ios-resume.pdf';
 const latinFontPath = 'assets/fonts/inter/InterVariable.otf';
+const wechatQrPath = 'assets/images/qrcode-wechat.png';
+const qqQrPath = 'assets/images/qrcode-qq.png';
 
 test('renders resume content from the provided PDF', () => {
   [
@@ -54,6 +56,28 @@ test('keeps detailed responsibilities and technical highlights from the PDF', ()
     '活动订单的退货',
     '拖动地图',
   ].forEach((text) => assert.match(html + pdfHtml, new RegExp(text)));
+});
+
+test('expands Dreame smart ring responsibilities with health and RN details', () => {
+  [
+    'App 主体框架基于 React Native',
+    '本地 SDK 与 RN 通讯',
+    '音乐播放监控',
+    '心率、体温、血氧',
+    '戒指采集的健康数据、睡眠数据',
+    '功能订阅的 Apple 内购',
+    '心电图绘制',
+  ].forEach((text) => assert.match(html + js + pdfHtml, new RegExp(text)));
+
+  [
+    'React Native shell',
+    'native SDK',
+    'music playback monitoring',
+    'heart rate, body temperature, and blood oxygen',
+    'sleep data',
+    'Apple in-app purchase subscription',
+    'ECG drawing',
+  ].forEach((text) => assert.match(js, new RegExp(text)));
 });
 
 test('translates enriched resume details into English', () => {
@@ -155,9 +179,28 @@ test('does not show expected salary information', () => {
 test('uses official Font Awesome icons for WeChat and QQ actions', () => {
   assert.match(html, /class="fa fa-weixin"/);
   assert.match(html, /class="fa fa-qq"/);
+  assert.match(html, /src="assets\/images\/qrcode-wechat\.png\?v=20260613-white"/);
+  assert.match(html, /src="assets\/images\/qrcode-qq\.png\?v=20260613-qq-1931"/);
+  assert.equal(existsSync(wechatQrPath), true, `missing QR image: ${wechatQrPath}`);
+  assert.equal(existsSync(qqQrPath), true, `missing QR image: ${qqQrPath}`);
+  assert.ok(statSync(wechatQrPath).size < 45000, `WeChat QR image should stay compressed: ${wechatQrPath}`);
+  assert.ok(statSync(qqQrPath).size < 60000, `QQ QR image should stay compressed: ${qqQrPath}`);
   const socialQrButtons = html.match(/<button class="social-qr-btn"[\s\S]*?<\/button>/g) || [];
   assert.equal(socialQrButtons.length, 2);
   socialQrButtons.forEach((buttonHtml) => assert.doesNotMatch(buttonHtml, /<svg/));
+  const socialHtml = html.match(/<ul class="social list-inline">[\s\S]*?<\/ul>/)[0];
+  const socialOrder = [
+    'aria-label="Phone"',
+    'data-qr-type="wechat"',
+    'data-qr-type="qq"',
+    'aria-label="Email"',
+    'aria-label="GitHub"',
+  ].map((marker) => socialHtml.indexOf(marker));
+  assert.deepEqual(
+    socialOrder,
+    [...socialOrder].sort((a, b) => a - b),
+    'social actions should be ordered as phone, WeChat, QQ, email, GitHub',
+  );
   assert.match(css, /\.social a \.fa,[\s\S]*?\.social-qr-btn \.fa\s*{[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;/);
 });
 
