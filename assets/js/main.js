@@ -244,10 +244,15 @@ var resumeTranslations = {
   var languageButtons = Array.prototype.slice.call(document.querySelectorAll('[data-lang]'));
   var themeToggle = document.querySelector('[data-theme-toggle]');
   var themeLabel = document.querySelector('[data-theme-label]');
+  var themeColorMeta = document.querySelector('[data-theme-color]');
   var resumeAction = document.querySelector('[data-resume-action]');
   var resumeActionLabel = document.querySelector('[data-action-label]');
   var resumePdfPath = 'assets/files/xiajunhui-ios-resume.pdf';
   var resumePdfFileName = '夏军辉_iOS工程师简历.pdf';
+  var themeColors = {
+    light: '#eef3f6',
+    dark: '#101820'
+  };
 
   function getStoredLanguage() {
     var stored = localStorage.getItem('resumeLanguage');
@@ -371,33 +376,6 @@ var resumeTranslations = {
     };
   }
 
-  function getResumePdfUrl() {
-    return new URL(resumePdfPath, window.location.href).href;
-  }
-
-  async function getResumePdfFile() {
-    var response = await fetch(getResumePdfUrl());
-    if (!response.ok) {
-      throw new Error('Unable to load resume PDF');
-    }
-    var blob = await response.blob();
-    return new File([blob], resumePdfFileName, { type: 'application/pdf' });
-  }
-
-  async function shareResumePdf(language) {
-    if (!navigator.canShare || typeof fetch !== 'function' || typeof File !== 'function') {
-      return false;
-    }
-    var file = await getResumePdfFile();
-    var payload = getSharePayload(language);
-    payload.files = [file];
-    if (!navigator.canShare(payload)) {
-      return false;
-    }
-    await navigator.share(payload);
-    return true;
-  }
-
   function setActionVisual(iconClass, labelText) {
     if (!resumeAction) {
       return;
@@ -453,16 +431,6 @@ var resumeTranslations = {
     var language = getStoredLanguage();
     if (isMobileViewport() && canNativeShare()) {
       try {
-        if (await shareResumePdf(language)) {
-          return;
-        }
-      } catch (error) {
-        if (error && error.name === 'AbortError') {
-          return;
-        }
-      }
-
-      try {
         await navigator.share(getSharePayload(language));
         return;
       } catch (error) {
@@ -505,6 +473,10 @@ var resumeTranslations = {
     var dictionary = getDictionary(language);
 
     root.setAttribute('data-theme', nextTheme);
+    root.style.colorScheme = nextTheme === 'dark' ? 'only dark' : 'only light';
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute('content', themeColors[nextTheme]);
+    }
     if (themeToggle) {
       var isDark = nextTheme === 'dark';
       themeToggle.setAttribute('aria-pressed', String(isDark));

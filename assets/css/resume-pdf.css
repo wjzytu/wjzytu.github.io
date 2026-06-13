@@ -225,8 +225,21 @@ li:last-child {
   padding-bottom: 4mm;
   margin-bottom: 4mm;
   border-bottom: 1px solid var(--hairline);
+}
+
+.pdf-entry {
   break-inside: avoid;
   page-break-inside: avoid;
+}
+
+.pdf-project {
+  break-inside: auto;
+  page-break-inside: auto;
+}
+
+.pdf-entry-head {
+  break-after: avoid;
+  page-break-after: avoid;
 }
 
 .pdf-entry:last-child,
@@ -291,7 +304,7 @@ li:last-child {
 
 @page {
   size: A4;
-  margin: 13mm 15mm;
+  margin: 10mm 12mm;
 }
 
 @media print {
@@ -314,10 +327,5 @@ li:last-child {
 
   .pdf-page + .pdf-page {
     padding-top: 0;
-  }
-
-  .pdf-page-title {
-    break-before: page;
-    page-break-before: always;
   }
 }
