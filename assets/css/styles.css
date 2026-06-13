@@ -344,6 +344,10 @@ li {
   z-index: 200;
 }
 
+.qr-backdrop {
+  display: none;
+}
+
 /* 小三角指向上方（因为弹出框在按钮下方） */
 .qr-popup::before {
   content: "";
@@ -392,6 +396,7 @@ li {
   height: 204px;
   border-radius: 6px;
   object-fit: contain;
+  cursor: pointer;
 }
 
 .qr-desc {
@@ -399,6 +404,36 @@ li {
   font-size: 11px !important;
   color: var(--muted) !important;
   line-height: 1.4;
+}
+
+.qr-save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 34px;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--heading);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.qr-save-btn:hover,
+.qr-save-btn:focus {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  outline: none;
+}
+
+.qr-close-btn {
+  display: none;
 }
 
 /* 悬停/点击时显示弹出框（桌面） */
@@ -949,6 +984,28 @@ li {
     justify-content: center;
   }
 
+  body.qr-modal-open {
+    overflow: hidden;
+  }
+
+  .qr-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.38);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 190;
+  }
+
+  body.qr-modal-open .qr-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
   .social-qr-item:not(.qr-open) .qr-popup {
     display: none;
   }
@@ -956,15 +1013,42 @@ li {
   .social-qr-item.qr-open .qr-popup {
     display: block;
     position: fixed;
-    top: 120px;
+    top: 50%;
     left: 50%;
-    width: min(232px, calc(100vw - 32px));
-    transform: translateX(-50%) translateY(0);
+    width: min(248px, calc(100vw - 32px));
+    padding-top: 38px;
+    transform: translate(-50%, -50%);
+    z-index: 210;
   }
 
   .social-qr-item.qr-open .qr-popup::before,
   .social-qr-item.qr-open .qr-popup::after {
     display: none;
+  }
+
+  .qr-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface-soft);
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .qr-close-btn:hover,
+  .qr-close-btn:focus {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    outline: none;
   }
 
   .site-controls {

@@ -12,6 +12,10 @@ var resumeTranslations = {
     'controls.copyLink': '复制链接',
     'controls.linkCopied': '链接已复制',
     'controls.shareText': '夏军辉的 iOS 工程师简历',
+    'qr.wechat.title': '微信',
+    'qr.qq.title': 'QQ',
+    'qr.desc': '扫码添加好友',
+    'qr.save': '保存二维码',
     'about.heading': '个人优势',
     'about.lead': '11年工作经验，长期负责 iOS App 架构、开发、上架和线上问题排查，做过蓝牙、Apple Watch、Apple Health、小组件、实时活动、React Native 等项目。',
     'about.item1': '熟练掌握 Objective-C、Swift、SwiftUI，既能处理历史项目，也能跟进 Apple 生态新能力。',
@@ -127,6 +131,10 @@ var resumeTranslations = {
     'controls.copyLink': 'Copy Link',
     'controls.linkCopied': 'Link copied',
     'controls.shareText': 'Junhui Xia, Senior iOS Engineer',
+    'qr.wechat.title': 'WeChat',
+    'qr.qq.title': 'QQ',
+    'qr.desc': 'Scan to add me',
+    'qr.save': 'Save QR code',
     'about.heading': 'Profile',
     'about.lead': '11 years of experience in iOS app architecture, development, App Store submission, and production troubleshooting, with hands-on work in Bluetooth, Apple Watch, Apple Health, widgets, Live Activities, and React Native.',
     'about.item1': 'Proficient in Objective-C, Swift, and SwiftUI; able to maintain legacy projects while adopting new Apple ecosystem capabilities.',
@@ -558,6 +566,13 @@ var resumeTranslations = {
     toast.className = 'qr-toast';
     document.body.appendChild(toast);
   }
+  var backdrop = document.querySelector('[data-qr-backdrop]');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.className = 'qr-backdrop';
+    backdrop.setAttribute('data-qr-backdrop', '');
+    document.body.appendChild(backdrop);
+  }
 
   function showToast(msg) {
     toast.textContent = msg;
@@ -583,49 +598,118 @@ var resumeTranslations = {
     return Promise.resolve();
   }
 
-  function tryOpenApp(type, account) {
-    // 尝试 URL scheme 跳转对应 App
-    if (type === 'wechat') {
-      // 微信没有公开的添加好友 scheme，退回复制
-      return false;
+  function getQrFileName(type) {
+    return type === 'wechat' ? 'xiajunhui-wechat-qrcode.png' : 'xiajunhui-qq-qrcode.png';
+  }
+
+  function getQrImageUrl(img) {
+    return img.currentSrc || img.getAttribute('src') || img.src;
+  }
+
+  function downloadQrImage(img, type) {
+    var link = document.createElement('a');
+    link.href = getQrImageUrl(img);
+    link.download = getQrFileName(type);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  async function getQrImageFile(img, type) {
+    var response = await fetch(getQrImageUrl(img));
+    if (!response.ok) {
+      throw new Error('Unable to load QR image');
     }
-    if (type === 'qq') {
-      // QQ 添加好友 scheme（部分版本支持）
-      var scheme = 'mqq://card/show_pslcard?src_type=internal&source=sharecard&version=1&uin=' + encodeURIComponent(account);
-      var iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = scheme;
-      document.body.appendChild(iframe);
-      setTimeout(function () { document.body.removeChild(iframe); }, 1500);
-      return true;
+    var blob = await response.blob();
+    return new File([blob], getQrFileName(type), { type: blob.type || 'image/png' });
+  }
+
+  async function saveQrImage(img, type, label) {
+    if (!img) {
+      return;
     }
-    return false;
+    if (isMobile && navigator.share && navigator.canShare && typeof fetch === 'function' && typeof File === 'function') {
+      try {
+        var file = await getQrImageFile(img, type);
+        var payload = {
+          title: label + '二维码',
+          text: '扫码添加' + label,
+          files: [file]
+        };
+        if (navigator.canShare(payload)) {
+          await navigator.share(payload);
+          showToast('请选择保存图片或分享二维码');
+          return;
+        }
+      } catch (error) {
+        if (error && error.name === 'AbortError') {
+          return;
+        }
+      }
+    }
+    downloadQrImage(img, type);
+    showToast('已开始保存' + label + '二维码图片');
+  }
+
+  function closeQrPopups() {
+    document.querySelectorAll('.social-qr-item.qr-open').forEach(function (el) {
+      el.classList.remove('qr-open');
+    });
+    document.body.classList.remove('qr-modal-open');
+  }
+
+  function openQrPopup(item) {
+    closeQrPopups();
+    item.classList.add('qr-open');
+    document.body.classList.add('qr-modal-open');
   }
 
   document.querySelectorAll('.social-qr-item').forEach(function (item) {
     var btn = item.querySelector('.social-qr-btn');
+    var popup = item.querySelector('.qr-popup');
+    var qrImage = item.querySelector('[data-qr-image]');
+    var saveButton = item.querySelector('[data-qr-save]');
+    var closeButton = item.querySelector('[data-qr-close]');
     var type = item.dataset.qrType;
     var account = item.dataset.account || '';
     var label = type === 'wechat' ? '微信' : 'QQ';
 
+    if (popup) {
+      popup.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    }
+
+    if (qrImage) {
+      qrImage.addEventListener('click', function (e) {
+        e.stopPropagation();
+        saveQrImage(qrImage, type, label);
+      });
+    }
+
+    if (saveButton) {
+      saveButton.addEventListener('click', function (e) {
+        e.stopPropagation();
+        saveQrImage(qrImage, type, label);
+      });
+    }
+
+    if (closeButton) {
+      closeButton.addEventListener('click', function (e) {
+        e.stopPropagation();
+        closeQrPopups();
+      });
+    }
+
     if (isMobile) {
-      // 手机端：点击按钮 → 复制 + 尝试跳转
+      // 手机端：点击按钮只打开居中的二维码弹窗。
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var opened = tryOpenApp(type, account);
-        copyText(account).then(function () {
-          if (opened) {
-            showToast('已尝试打开 ' + label + '，去搜索添加好友 👋');
-          } else {
-            showToast('已复制' + label + '号：' + account + '，去' + label + '添加好友 👋');
-          }
-        }).catch(function () {
-          showToast('请在 ' + label + ' 中搜索：' + account);
-        });
-        // 同时切换二维码展示
         var isOpen = item.classList.contains('qr-open');
-        document.querySelectorAll('.social-qr-item.qr-open').forEach(function(el){ el.classList.remove('qr-open'); });
-        if (!isOpen) item.classList.add('qr-open');
+        closeQrPopups();
+        if (!isOpen) {
+          openQrPopup(item);
+        }
       });
     } else {
       // 桌面端：点击按钮复制，hover 显示二维码（CSS 已处理 hover）
@@ -638,8 +722,12 @@ var resumeTranslations = {
     }
   });
 
+  backdrop.addEventListener('click', function () {
+    closeQrPopups();
+  });
+
   // 点击页面其他区域关闭手机端弹出框
   document.addEventListener('click', function () {
-    document.querySelectorAll('.social-qr-item.qr-open').forEach(function(el){ el.classList.remove('qr-open'); });
+    closeQrPopups();
   });
 })();

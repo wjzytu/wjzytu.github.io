@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="uxiume.ico">
     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.css">
-    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css?v=20260613-qrcode-crop">
+    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css?v=20260613-qr-modal">
 </head>
 
 <body>
@@ -37,12 +37,19 @@
                                 <i class="fa fa-weixin" aria-hidden="true"></i>
                             </button>
                             <div class="qr-popup">
+                                <button class="qr-close-btn" type="button" data-qr-close aria-label="关闭微信二维码弹窗">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
                                 <div class="qr-popup-title">
                                     <i class="fa fa-weixin" aria-hidden="true"></i>
-                                    微信
+                                    <span data-i18n="qr.wechat.title">微信</span>
                                 </div>
-                                <img src="assets/images/qrcode-wechat.png?v=20260613-white" alt="微信二维码" width="204" height="204" loading="lazy" decoding="async">
-                                <p class="qr-desc">扫码添加好友</p>
+                                <img class="qr-image" src="assets/images/qrcode-wechat.png?v=20260613-white" alt="微信二维码" width="204" height="204" loading="lazy" decoding="async" data-qr-image>
+                                <p class="qr-desc" data-i18n="qr.desc">扫码添加好友</p>
+                                <button class="qr-save-btn" type="button" data-qr-save aria-label="保存微信二维码">
+                                    <i class="fa fa-download" aria-hidden="true"></i>
+                                    <span data-i18n="qr.save">保存二维码</span>
+                                </button>
                             </div>
                         </li>
                         <li class="social-qr-item" data-qr-type="qq" data-account="你的QQ号">
@@ -50,12 +57,19 @@
                                 <i class="fa fa-qq" aria-hidden="true"></i>
                             </button>
                             <div class="qr-popup">
+                                <button class="qr-close-btn" type="button" data-qr-close aria-label="关闭QQ二维码弹窗">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
                                 <div class="qr-popup-title">
                                     <i class="fa fa-qq" aria-hidden="true"></i>
-                                    QQ
+                                    <span data-i18n="qr.qq.title">QQ</span>
                                 </div>
-                                <img src="assets/images/qrcode-qq.png?v=20260613-qq-1931" alt="QQ二维码" width="204" height="204" loading="lazy" decoding="async">
-                                <p class="qr-desc">扫码添加好友</p>
+                                <img class="qr-image" src="assets/images/qrcode-qq.png?v=20260613-qq-1931" alt="QQ二维码" width="204" height="204" loading="lazy" decoding="async" data-qr-image>
+                                <p class="qr-desc" data-i18n="qr.desc">扫码添加好友</p>
+                                <button class="qr-save-btn" type="button" data-qr-save aria-label="保存QQ二维码">
+                                    <i class="fa fa-download" aria-hidden="true"></i>
+                                    <span data-i18n="qr.save">保存二维码</span>
+                                </button>
                             </div>
                         </li>
                         <li>
@@ -409,6 +423,6 @@
 
     <script src="assets/plugins/jquery-1.11.2.min.js"></script>
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/main.js?v=20260613-dreame-health"></script>
+    <script src="assets/js/main.js?v=20260613-qr-modal"></script>
 </body>
 </html>
