@@ -174,6 +174,10 @@ test('uses Inter for Latin text while keeping Chinese font configurable', () => 
 test('provides mobile sharing and PDF export actions', () => {
   assert.match(html, /data-resume-action/);
   assert.match(html, /data-action-label/);
+  assert.match(html, /<span data-action-label data-i18n="controls\.shareResume">分享<\/span>/);
+  assert.match(js, /'controls\.shareResume': '分享'/);
+  assert.match(js, /'controls\.shareResume': 'Share'/);
+  assert.doesNotMatch(html + js, /分享简历|Share Resume/);
   assert.match(js, /navigator\.share/);
   assert.match(js, /await navigator\.share\(getSharePayload\(language\)\)/);
   assert.match(js, /if \(isMobileViewport\(\)\)\s*{[\s\S]*?setActionVisual\('fa fa-share-alt', dictionary\['controls.shareResume'\]\)/);
