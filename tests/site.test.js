@@ -6,8 +6,11 @@ const html = readFileSync('index.html', 'utf8');
 const css = readFileSync('assets/css/styles.css', 'utf8');
 const js = readFileSync('assets/js/main.js', 'utf8');
 const pdfHtml = readFileSync('resume-pdf.html', 'utf8');
+const pdfHtmlEn = readFileSync('resume-pdf-en.html', 'utf8');
 const pdfCss = readFileSync('assets/css/resume-pdf.css', 'utf8');
+const pdfGenerator = readFileSync('scripts/generate_resume_pdfs.py', 'utf8');
 const pdfPath = 'assets/files/xiajunhui-ios-resume.pdf';
+const pdfPathEn = 'assets/files/junhui-xia-ios-resume-en.pdf';
 const latinFontPath = 'assets/fonts/inter/InterVariable.otf';
 const profileImagePath = 'assets/images/profile.png';
 const wechatQrPath = 'assets/images/qrcode-wechat.png';
@@ -187,7 +190,10 @@ test('provides mobile sharing and PDF export actions', () => {
   assert.doesNotMatch(js, /navigator\.canShare/);
   assert.match(js, /navigator\.clipboard\.writeText/);
   assert.match(js, /assets\/files\/xiajunhui-ios-resume\.pdf/);
-  assert.match(js, /downloadResumePdf/);
+  assert.match(js, /assets\/files\/junhui-xia-ios-resume-en\.pdf/);
+  assert.match(js, /resumePdfFiles/);
+  assert.match(js, /function downloadResumePdf\(language\)/);
+  assert.match(js, /resumePdfFiles\[language\] \|\| resumePdfFiles\.zh/);
   assert.match(js, /updateResumeActionLabel/);
   assert.match(css, /@media print/);
   assert.match(css, /\.site-controls/);
@@ -196,10 +202,54 @@ test('provides mobile sharing and PDF export actions', () => {
   assert.match(css, /display:\s*none\s*!important/);
   assert.equal(existsSync(pdfPath), true);
   assert.ok(statSync(pdfPath).size > 50000);
+  assert.equal(existsSync(pdfPathEn), true);
+  assert.ok(statSync(pdfPathEn).size > 50000);
 });
 
-test('does not show expected salary information', () => {
-  assert.doesNotMatch(html + js + pdfHtml, /期望薪资|Expected salary|hero\.salary|25-30K|25-35K/);
+test('keeps expected city and salary out of the hero quick facts', () => {
+  const quickFacts = html.match(/<ul class="quick-facts list-inline">[\s\S]*?<\/ul>/)[0];
+  assert.doesNotMatch(quickFacts + js, /期望城市|Preferred city|hero\.city|hero\.salary|25-30K|25-35K/);
+  assert.doesNotMatch(quickFacts, /期望薪资|Expected salary/);
+});
+
+test('uses the simplified contact details with copyable WeChat and expected salary', () => {
+  const contactSection = html.match(/<section class="section info">[\s\S]*?<\/section>/)[0];
+  [
+    'changzuibuxingzimeng',
+    '薪资面议',
+    'data-copy-value="changzuibuxingzimeng"',
+  ].forEach((text) => assert.match(contactSection + js + pdfHtml, new RegExp(text)));
+
+  [
+    '复制微信号成功',
+    'WeChat ID copied',
+    'Expected salary: Negotiable',
+  ].forEach((text) => assert.match(js + pdfHtmlEn, new RegExp(text)));
+
+  assert.doesNotMatch(contactSection + js + pdfHtml, /期望薪资：面议/);
+
+  [
+    'GitHub：github.com/uxiume',
+    '在线简历',
+    '求职意向',
+    '到岗时间',
+    'GitHub: github.com/uxiume',
+    'Online resume',
+    'Job target',
+    'Availability',
+  ].forEach((text) => assert.doesNotMatch(contactSection + pdfHtml + pdfHtmlEn, new RegExp(text)));
+});
+
+test('removes the core highlights module from web and PDF resumes', () => {
+  [
+    '核心亮点',
+    'Core Highlights',
+    'highlights.heading',
+    'Apple Watch 独立开发',
+    'Independent Apple Watch development',
+    'RN 原生 SDK 桥接与智能硬件项目经验',
+    'RN native SDK bridging and smart hardware experience',
+  ].forEach((text) => assert.doesNotMatch(html + js + pdfHtml + pdfHtmlEn, new RegExp(text)));
 });
 
 test('uses official Font Awesome icons for WeChat and QQ actions', () => {
@@ -276,6 +326,24 @@ test('keeps requested skill progress values', () => {
   assert.match(skillSection, /<span>Objective-C<\/span>[\s\S]*?style="width: 95%"/);
   assert.match(skillSection, /<span>Swift<\/span>[\s\S]*?style="width: 95%"/);
   assert.match(skillSection, /<span>SwiftUI<\/span>[\s\S]*?style="width: 80%"/);
+  assert.match(skillSection, /<span[^>]*>Cocoapods \/ 组件化<\/span>[\s\S]*?style="width: 90%"/);
+  assert.match(skillSection, /<span[^>]*>苹果手表\/苹果健康<\/span>[\s\S]*?style="width: 86%"/);
+  assert.match(skillSection, /<span[^>]*>蓝牙 \/ OTA<\/span>[\s\S]*?style="width: 90%"/);
+  assert.match(skillSection, /<span>React Native \/ Flutter<\/span>[\s\S]*?data-i18n="skills.project"/);
+  [
+    'Objective-C',
+    'Swift',
+    'SwiftUI',
+    'Cocoapods / 组件化',
+    '苹果手表/苹果健康',
+    '蓝牙 / OTA',
+    'React Native / Flutter',
+    'AI Tools / Cursor / Codex',
+  ].reduce((previousIndex, marker) => {
+    const nextIndex = skillSection.indexOf(marker);
+    assert.ok(nextIndex > previousIndex, `${marker} should be in the requested skill order`);
+    return nextIndex;
+  }, -1);
   assert.ok(
     skillSection.indexOf('React Native / Flutter') < skillSection.indexOf('AI Tools / Cursor / Codex'),
     'AI tools skill should be the final web skill item',
@@ -283,24 +351,66 @@ test('keeps requested skill progress values', () => {
   assert.match(skillSection, /<span>AI Tools \/ Cursor \/ Codex<\/span>[\s\S]*?data-i18n="skills.ai"[\s\S]*?style="width: 78%"/);
   assert.match(js, /'skills.ai': 'AI 提效'/);
   assert.match(js, /'skills.ai': 'Daily productivity'/);
+  assert.match(js, /'skills.privatePods': '熟练'/);
+  assert.match(js, /'skills.bleOta': '项目经验'/);
+  assert.match(js, /'skills.watchHealthName': 'Apple Watch \/ Apple Health'/);
   assert.doesNotMatch(skillSection, /Swift \/ SwiftUI/);
+  assert.doesNotMatch(skillSection, /Bluetooth LE \/ OTA/);
+  assert.doesNotMatch(skillSection, /Cocoapods 私有库 \/ 组件化/);
+  assert.doesNotMatch(skillSection, /实践与学习中/);
+});
+
+test('adds the requested domain experience tags in Chinese and English', () => {
+  const toolboxSection = html.match(/<section class="section toolbox">[\s\S]*?<\/section>/)[0];
+  [
+    'Objective-C',
+    'Swift',
+    'SwiftUI',
+    'ReactNative',
+    'Flutter',
+    'Cocoapods',
+    '智能穿戴',
+    '医疗App开发审核',
+    '医疗合规文档',
+    '地图',
+    '数据库',
+  ].forEach((text) => assert.match(toolboxSection, new RegExp(text)));
+
+  [
+    "'toolbox.reactNative': 'React Native'",
+    "'toolbox.wearable': 'Smart Wearables'",
+    "'toolbox.medicalApp': 'Medical App Development & Review'",
+    "'toolbox.medicalDocs': 'Medical Compliance Documentation'",
+    "'toolbox.map': 'Maps'",
+    "'toolbox.database': 'Database'",
+  ].forEach((text) => assert.ok(js.includes(text), `missing translation: ${text}`));
 });
 
 test('uses a dedicated PDF resume template instead of the web layout', () => {
-  assert.match(pdfHtml, /class="pdf-resume-document"/);
-  assert.match(pdfHtml, /class="pdf-page"/);
-  assert.match(pdfHtml, /class="pdf-skill-band"/);
+  [pdfHtml, pdfHtmlEn].forEach((template) => {
+    assert.match(template, /class="pdf-resume-document"/);
+    assert.match(template, /class="pdf-page"/);
+    assert.match(template, /class="pdf-skill-band"/);
+    assert.match(template, /class="pdf-project-detail"/);
+    assert.doesNotMatch(template, /href="https:\/\/github\.com\/uxiume"/);
+  });
   assert.match(pdfHtml, /企业 OA<\/span>\s*<span>AI Tools \/ Cursor \/ Codex<\/span>/);
-  assert.match(pdfHtml, /class="pdf-project-detail"/);
-  assert.match(pdfCss, /@page\s*{[^}]*size:\s*A4;[^}]*margin:\s*10mm 12mm/s);
+  assert.match(pdfHtmlEn, /Enterprise OA<\/span>\s*<span>AI Tools \/ Cursor \/ Codex<\/span>/);
+  assert.match(pdfCss, /@page\s*{[^}]*size:\s*A4;[^}]*margin:\s*13\.5mm 17mm 15mm/s);
   assert.match(pdfCss, /\.pdf-page\s*{[^}]*width:\s*210mm/s);
-  assert.match(pdfCss, /\.pdf-page\s*{[^}]*padding:\s*13mm 15mm/s);
-  assert.match(pdfCss, /body\s*{[^}]*font-size:\s*9\.8pt/s);
+  assert.match(pdfCss, /\.pdf-page\s*{[^}]*padding:\s*13\.5mm 17mm 15mm/s);
+  assert.match(pdfCss, /body\s*{[^}]*font-size:\s*9\.9pt/s);
+  assert.match(pdfCss, /@media print[\s\S]*?body\s*{[^}]*font-size:\s*9\.25pt/s);
+  assert.match(pdfCss, /@media print[\s\S]*?\.pdf-page\s*{[^}]*width:\s*auto;[^}]*min-height:\s*auto;[^}]*padding:\s*0/s);
+  assert.match(pdfCss, /@media print[\s\S]*?\.pdf-page:first-child\s*{[^}]*break-after:\s*page/s);
   assert.match(pdfCss, /\.pdf-entry\s*{[^}]*break-inside:\s*avoid/s);
   assert.match(pdfCss, /\.pdf-project\s*{[^}]*break-inside:\s*auto/s);
   assert.doesNotMatch(pdfCss, /\.pdf-page-title\s*{[^}]*break-before:\s*page/s);
   assert.doesNotMatch(pdfCss, /page-break-before:\s*always/);
   assert.match(pdfCss, /print-color-adjust:\s*exact/);
+  assert.match(pdfGenerator, /require\(process\.env\.RESUME_PLAYWRIGHT\)/);
+  assert.match(pdfGenerator, /preferCSSPageSize:\s*true/);
+  assert.match(pdfGenerator, /Google Chrome\.app/);
   assert.doesNotMatch(pdfCss, /\.pdf-sidebar/);
   assert.doesNotMatch(pdfCss, /\.pdf-layout/);
   assert.doesNotMatch(pdfCss, /\.pdf-project-grid/);

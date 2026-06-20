@@ -827,6 +827,28 @@ li {
   text-align: center;
 }
 
+.contact-copy-btn {
+  display: inline;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-strong);
+  font: inherit;
+  font-weight: 700;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.contact-copy-btn:hover,
+.contact-copy-btn:focus {
+  color: var(--blue);
+  text-decoration: none;
+}
+
 .skillset {
   display: grid;
   gap: 18px;

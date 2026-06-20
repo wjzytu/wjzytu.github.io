@@ -3,7 +3,6 @@ var resumeTranslations = {
     'hero.eyebrow': '11年工作经验 · 杭州 · iOS',
     'hero.name': '夏军辉',
     'hero.title': 'iOS 高级工程师',
-    'hero.city': '期望城市：杭州',
     'hero.stack': 'Objective-C / Swift / SwiftUI / React Native / Flutter',
     'controls.dark': '深色',
     'controls.light': '浅色',
@@ -94,12 +93,25 @@ var resumeTranslations = {
     'project.laiyidan.desc': '本地生活服务 App，提供附近超市日常快消品购买和配送服务，涉及定位、在线支付、商品展示、红包优惠和签到领红包等功能。',
     'contact.heading': '联系信息',
     'contact.location': '浙江省杭州市',
+    'contact.wechat': 'changzuibuxingzimeng',
+    'contact.wechatCopied': '复制微信号成功',
+    'contact.salary': '薪资面议',
     'skills.heading': '技术能力',
     'skills.expert': '熟练',
     'skills.project': '项目经验',
+    'skills.privatePodsName': 'Cocoapods / 组件化',
+    'skills.privatePods': '熟练',
+    'skills.watchHealthName': '苹果手表/苹果健康',
+    'skills.bleOtaName': '蓝牙 / OTA',
+    'skills.bleOta': '项目经验',
     'skills.ai': 'AI 提效',
-    'skills.learning': '实践与学习中',
     'toolbox.heading': '领域经验',
+    'toolbox.reactNative': 'ReactNative',
+    'toolbox.wearable': '智能穿戴',
+    'toolbox.medicalApp': '医疗App开发审核',
+    'toolbox.medicalDocs': '医疗合规文档',
+    'toolbox.map': '地图',
+    'toolbox.database': '数据库',
     'toolbox.ble': '蓝牙 BLE',
     'toolbox.watch': 'Apple Watch',
     'toolbox.health': 'Apple Health',
@@ -122,7 +134,6 @@ var resumeTranslations = {
     'hero.eyebrow': '11 years of experience · Hangzhou · iOS',
     'hero.name': 'Junhui Xia',
     'hero.title': 'Senior iOS Engineer',
-    'hero.city': 'Preferred city: Hangzhou',
     'hero.stack': 'Objective-C / Swift / SwiftUI / React Native / Flutter',
     'controls.dark': 'Dark',
     'controls.light': 'Light',
@@ -213,12 +224,25 @@ var resumeTranslations = {
     'project.laiyidan.desc': 'A local lifestyle service app for nearby supermarket purchases and delivery, covering location services, online payment, product display, coupons, and check-in rewards.',
     'contact.heading': 'Contact',
     'contact.location': 'Hangzhou, Zhejiang, China',
+    'contact.wechat': 'changzuibuxingzimeng',
+    'contact.wechatCopied': 'WeChat ID copied',
+    'contact.salary': 'Expected salary: Negotiable',
     'skills.heading': 'Skills',
     'skills.expert': 'Expert',
     'skills.project': 'Project experience',
+    'skills.privatePodsName': 'CocoaPods / Modularization',
+    'skills.privatePods': 'Expert',
+    'skills.watchHealthName': 'Apple Watch / Apple Health',
+    'skills.bleOtaName': 'Bluetooth / OTA',
+    'skills.bleOta': 'Project experience',
     'skills.ai': 'Daily productivity',
-    'skills.learning': 'Hands-on / Learning',
     'toolbox.heading': 'Domain Experience',
+    'toolbox.reactNative': 'React Native',
+    'toolbox.wearable': 'Smart Wearables',
+    'toolbox.medicalApp': 'Medical App Development & Review',
+    'toolbox.medicalDocs': 'Medical Compliance Documentation',
+    'toolbox.map': 'Maps',
+    'toolbox.database': 'Database',
     'toolbox.ble': 'Bluetooth LE',
     'toolbox.watch': 'Apple Watch',
     'toolbox.health': 'Apple Health',
@@ -248,8 +272,16 @@ var resumeTranslations = {
   var themeColorMeta = document.querySelector('[data-theme-color]');
   var resumeAction = document.querySelector('[data-resume-action]');
   var resumeActionLabel = document.querySelector('[data-action-label]');
-  var resumePdfPath = 'assets/files/xiajunhui-ios-resume.pdf';
-  var resumePdfFileName = '夏军辉_iOS工程师简历.pdf';
+  var resumePdfFiles = {
+    zh: {
+      path: 'assets/files/xiajunhui-ios-resume.pdf',
+      fileName: '夏军辉_iOS工程师简历.pdf'
+    },
+    en: {
+      path: 'assets/files/junhui-xia-ios-resume-en.pdf',
+      fileName: 'Junhui_Xia_Senior_iOS_Engineer_Resume.pdf'
+    }
+  };
   var themeColors = {
     light: '#eef3f6',
     dark: '#101820'
@@ -317,7 +349,9 @@ var resumeTranslations = {
       'Apple Health',
       'React Native',
       'Flutter',
+      '组件化',
       '蓝牙 BLE',
+      '蓝牙',
       'AI 工具',
       'Cocoapods',
       'App Store',
@@ -345,6 +379,8 @@ var resumeTranslations = {
       'React Native',
       'Flutter',
       'Bluetooth LE',
+      'Bluetooth',
+      'Modularization',
       'AI tools',
       'CocoaPods',
       'App Store',
@@ -444,10 +480,11 @@ var resumeTranslations = {
     window.setTimeout(updateResumeActionLabel, 1600);
   }
 
-  function downloadResumePdf() {
+  function downloadResumePdf(language) {
+    var pdf = resumePdfFiles[language] || resumePdfFiles.zh;
     var link = document.createElement('a');
-    link.href = resumePdfPath;
-    link.download = resumePdfFileName;
+    link.href = pdf.path;
+    link.download = pdf.fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -455,7 +492,7 @@ var resumeTranslations = {
 
   async function copyResumeLink() {
     if (!canCopyLink()) {
-      downloadResumePdf();
+      downloadResumePdf(getStoredLanguage());
       return;
     }
     await navigator.clipboard.writeText(window.location.href);
@@ -473,16 +510,16 @@ var resumeTranslations = {
           return;
         }
       }
-      downloadResumePdf();
+      downloadResumePdf(language);
       return;
     }
 
     if (isMobileViewport()) {
-      downloadResumePdf();
+      downloadResumePdf(language);
       return;
     }
 
-    downloadResumePdf();
+    downloadResumePdf(language);
   }
 
   function translatePage(language) {
@@ -603,19 +640,39 @@ var resumeTranslations = {
   }
 
   function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text);
+    function fallbackCopy() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+      return Promise.resolve();
     }
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try { document.execCommand('copy'); } catch(e) {}
-    document.body.removeChild(ta);
-    return Promise.resolve();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(fallbackCopy);
+    }
+    return fallbackCopy();
   }
+
+  function getCurrentDictionary() {
+    var language = localStorage.getItem('resumeLanguage');
+    return resumeTranslations[language] || resumeTranslations.zh;
+  }
+
+  document.querySelectorAll('[data-copy-value]').forEach(function (button) {
+    button.addEventListener('click', function (event) {
+      event.stopPropagation();
+      var dictionary = getCurrentDictionary();
+      var messageKey = button.getAttribute('data-copy-success');
+      var message = dictionary[messageKey] || '复制成功';
+      copyText(button.getAttribute('data-copy-value') || button.textContent.trim()).then(function () {
+        showToast(message);
+      });
+    });
+  });
 
   function getQrFileName(type) {
     return type === 'wechat' ? 'xiajunhui-wechat-qrcode.png' : 'xiajunhui-qq-qrcode.png';
